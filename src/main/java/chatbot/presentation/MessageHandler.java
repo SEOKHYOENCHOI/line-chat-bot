@@ -5,25 +5,27 @@ import chatbot.domain.SourceId;
 import chatbot.domain.SourceRepository;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.Broadcast;
-import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.*;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 @LineMessageHandler
-@RequiredArgsConstructor
 public class MessageHandler {
     public static final String START_TO_WORK_MESSAGE = "업무시작을 눌러주세요.";
 
     private final LineMessagingClient lineMessagingClient;
     private final SourceRepository sourceRepository;
+
+    public MessageHandler(LineMessagingClient lineMessagingClient, SourceRepository sourceRepository) {
+        this.lineMessagingClient = lineMessagingClient;
+        this.sourceRepository = sourceRepository;
+    }
 
     @EventMapping
     public void handleMemberJoined(MemberJoinedEvent event) {
@@ -54,8 +56,6 @@ public class MessageHandler {
     @EventMapping
     public void handlerMessageEvent(MessageEvent<TextMessageContent> event) {
         log.info("textMessage {}", event);
-
-        lineMessagingClient.replyMessage(new ReplyMessage(event.getReplyToken(), new TextMessage("hi")));
     }
 
     @EventMapping
@@ -69,6 +69,10 @@ public class MessageHandler {
 
         sourceIds.getPushMessages(START_TO_WORK_MESSAGE)
                 .forEach(this.lineMessagingClient::pushMessage);
+    }
+
+    public void broadcast() {
+        lineMessagingClient.broadcast(createBroadcast(START_TO_WORK_MESSAGE));
     }
 
     private Broadcast createBroadcast(String message) {
