@@ -10,22 +10,19 @@ import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 @LineMessageHandler
+@RequiredArgsConstructor
 public class MessageHandler {
     public static final String START_TO_WORK_MESSAGE = "업무시작을 눌러주세요.";
 
     private final LineMessagingClient lineMessagingClient;
     private final SourceRepository sourceRepository;
-
-    public MessageHandler(LineMessagingClient lineMessagingClient, SourceRepository sourceRepository) {
-        this.lineMessagingClient = lineMessagingClient;
-        this.sourceRepository = sourceRepository;
-    }
 
     @EventMapping
     public void handleMemberJoined(MemberJoinedEvent event) {

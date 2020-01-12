@@ -2,6 +2,7 @@ package chatbot.config;
 
 import chatbot.presentation.CronExpressions;
 import chatbot.presentation.MessageHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +18,9 @@ import java.util.concurrent.Executors;
 @Configuration
 @EnableAsync
 @EnableScheduling
+@RequiredArgsConstructor
 public class SchedulingConfigurerConfiguration implements SchedulingConfigurer, CommandLineRunner {
     private final MessageHandler messageHandler;
-
-    public SchedulingConfigurerConfiguration(MessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
-    }
 
     @Bean
     public Executor configureTasks() {
