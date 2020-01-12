@@ -13,6 +13,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -37,17 +38,23 @@ public class MessageHandler {
     @EventMapping
     public void handleJoinEvent(JoinEvent event) {
         log.info("join {}", event);
+        SourceId sourceId = new SourceId(EventUtils.getSenderId(event));
 
-        Source source = new Source(new SourceId(EventUtils.getSenderId(event)));
-        sourceRepository.save(source);
+        if (!sourceRepository.existsBySourceId(sourceId)) {
+            Source source = new Source(sourceId);
+            sourceRepository.save(source);
+        }
     }
 
     @EventMapping
     public void handleLeave(LeaveEvent event) {
         log.info("leave {}", event);
 
-        Source source = new Source(new SourceId(EventUtils.getSenderId(event)));
-        sourceRepository.delete(source);
+        SourceId sourceId = new SourceId(EventUtils.getSenderId(event));
+        if (sourceRepository.existsBySourceId(sourceId)) {
+            Source source = new Source(sourceId);
+            sourceRepository.delete(source);
+        }
     }
 
     @EventMapping
@@ -60,7 +67,7 @@ public class MessageHandler {
         log.info("other event {}", event);
     }
 
-    private void notifyStartToWork() {
+    public void notifyStartToWork() {
         List<Source> sources = sourceRepository.findAll();
         SourceIds sourceIds = new SourceIds(sources);
 
@@ -69,6 +76,7 @@ public class MessageHandler {
     }
 
     public void broadcast() {
+        log.info(String.valueOf(LocalDateTime.now()));
         lineMessagingClient.broadcast(createBroadcast(START_TO_WORK_MESSAGE));
     }
 
