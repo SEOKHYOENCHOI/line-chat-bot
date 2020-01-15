@@ -35,10 +35,9 @@ public class SchedulingConfigurerConfiguration implements SchedulingConfigurer, 
     @Override
     public void run(String... args) throws Exception {
         ScheduledTaskRegistrar taskRegistrar = new ScheduledTaskRegistrar();
-        taskRegistrar.addCronTask(new CronTask(messageHandler::notifyStartToWork, CronExpressions.MON_12_55.getExpression()));
-        taskRegistrar.addCronTask(new CronTask(messageHandler::notifyStartToWork, CronExpressions.TUE_FRI_09_25.getExpression()));
-        taskRegistrar.addCronTask(new CronTask(messageHandler::notifyStartToWork, CronExpressions.SUN_20_40.getExpression()));
-        taskRegistrar.addCronTask(new CronTask(messageHandler::broadcast, CronExpressions.EVERY_5_SECONDS.getExpression()));
+        taskRegistrar.addCronTask(new CronTask(() -> messageHandler.notify(MessageHandler.START_OF_WORK_MESSAGE), CronExpressions.MON_12_55.getExpression()));
+        taskRegistrar.addCronTask(new CronTask(() -> messageHandler.notify(MessageHandler.START_OF_WORK_MESSAGE), CronExpressions.TUE_FRI_09_25.getExpression()));
+        taskRegistrar.addCronTask(new CronTask(() -> messageHandler.notify(MessageHandler.END_OF_WORK_MESSAGE), CronExpressions.MON_FRI_17_59.getExpression()));
         configureTasks(taskRegistrar);
     }
 }

@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @LineMessageHandler
 @RequiredArgsConstructor
 public class MessageHandler {
-    public static final String START_TO_WORK_MESSAGE = "업무시작을 눌러주세요.";
+    public static final String START_OF_WORK_MESSAGE = "업무 시작 버튼을 눌러주세요.";
+    public static final String END_OF_WORK_MESSAGE = "업무 끗 버튼 눌러주세요.";
 
     private final LineMessagingClient lineMessagingClient;
     private final SourceRepository sourceRepository;
@@ -67,17 +67,16 @@ public class MessageHandler {
         log.info("other event {}", event);
     }
 
-    public void notifyStartToWork() {
-        List<Source> sources = sourceRepository.findAll();
-        SourceIds sourceIds = new SourceIds(sources);
+    public void notify(String message) {
+        SourceIds sourceIds = new SourceIds(sourceRepository.findAll());
 
-        sourceIds.getPushMessages(START_TO_WORK_MESSAGE)
+        sourceIds.getPushMessages(message)
                 .forEach(this.lineMessagingClient::pushMessage);
     }
 
     public void broadcast() {
         log.info(String.valueOf(LocalDateTime.now()));
-        lineMessagingClient.broadcast(createBroadcast(START_TO_WORK_MESSAGE));
+        lineMessagingClient.broadcast(createBroadcast(START_OF_WORK_MESSAGE));
     }
 
     private Broadcast createBroadcast(String message) {
